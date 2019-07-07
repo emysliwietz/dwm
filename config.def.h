@@ -62,6 +62,7 @@ static const Layout layouts[] = {
 	{ "[M]",      monocle },
 	{ "TTT",      bstack },
 	{ "===",      bstackhoriz },
+	{ "[D]",      deck },
 };
 
 /* key definitions */
