@@ -1,20 +1,58 @@
---- dwm.c
-+++ dwm.c
-@@ -599,7 +682,7 @@ clientmessage(XEvent *e)
- 	XClientMessageEvent *cme = &e->xclient;
- 	Client *c = wintoclient(cme->window);
+--- dwm.c	2011-12-19 16:02:46.000000000 +0100
++++ dwm.c	2013-04-06 21:00:46.620830452 +0200
+@@ -1585,6 +1589,19 @@ setmfact(const Arg *arg) {
+ }
  
--	if (!c)
-+	if (!c && !(c = cropwintoclient(cme->window)))
- 		return;
- 	if (cme->message_type == netatom[NetWMState]) {
- 		if (cme->data.l[1] == netatom[NetWMFullscreen]
-@@ -1095,6 +1185,8 @@ killclient(const Arg *arg)
- {
- 	if (!selmon->sel)
- 		return;
-+	if (selmon->sel->crop)
-+		cropdelete(selmon->sel);
- 	if (!sendevent(selmon->sel, wmatom[WMDelete])) {
- 		XGrabServer(dpy);
- 		XSetErrorHandler(xerrordummy);
+ void
++setsmfact(const Arg *arg) {
++	float sf;
++
++	if(!arg || !selmon->lt[selmon->sellt]->arrange)
++		return;
++	sf = arg->sf < 1.0 ? arg->sf + selmon->smfact : arg->sf - 1.0;
++	if(sf < 0 || sf > 0.9)
++		return;
++	selmon->smfact = sf;
++	arrange(selmon);
++}
++
++void
+ setup(void) {
+ 	XSetWindowAttributes wa;
+ 
+@@ -1707,7 +1724,7 @@ textnw(const char *text, unsigned int le
+ 
+ void
+ tile(Monitor *m) {
+-	unsigned int i, n, h, mw, my, ty;
++	unsigned int i, n, h, smh, mw, my, ty;
+ 	Client *c;
+ 
+ 	for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+@@ -1725,9 +1742,23 @@ tile(Monitor *m) {
+ 			my += HEIGHT(c);
+ 		}
+ 		else {
+-			h = (m->wh - ty) / (n - i);
+-			resize(c, m->wx + mw, m->wy + ty, m->ww - mw - (2*c->bw), h - (2*c->bw), False);
+-			ty += HEIGHT(c);
++			smh = m->mh * m->smfact;
++			if(!(nexttiled(c->next)))
++				h = (m->wh - ty) / (n - i);
++			else
++				h = (m->wh - smh - ty) / (n - i);
++			if(h < minwsz) {
++				c->isfloating = True;
++				XRaiseWindow(dpy, c->win);
++				resize(c, m->mx + (m->mw / 2 - WIDTH(c) / 2), m->my + (m->mh / 2 - HEIGHT(c) / 2), m->ww - mw - (2*c->bw), h - (2*c->bw), False);
++				ty -= HEIGHT(c);
++			}
++			else
++				resize(c, m->wx + mw, m->wy + ty, m->ww - mw - (2*c->bw), h - (2*c->bw), False);
++			if(!(nexttiled(c->next)))
++				ty += HEIGHT(c) + smh;
++			else
++				ty += HEIGHT(c);
+ 		}
+ }
+ 
