@@ -1,11 +1,10 @@
 --- dwm.c
 +++ dwm.c
-@@ -233,6 +233,8 @@ static int xerror(Display *dpy, XErrorEvent *ee);
- static int xerrordummy(Display *dpy, XErrorEvent *ee);
- static int xerrorstart(Display *dpy, XErrorEvent *ee);
- static void zoom(const Arg *arg);
-+static void bstack(Monitor *m);
-+static void bstackhoriz(Monitor *m);
- 
- /* variables */
- static const char broken[] = "broken";
+@@ -157,6 +157,7 @@ static void configure(Client *c);
+ static void configurenotify(XEvent *e);
+ static void configurerequest(XEvent *e);
+ static Monitor *createmon(void);
++static void cyclelayout(const Arg *arg);
+ static void destroynotify(XEvent *e);
+ static void detach(Client *c);
+ static void detachstack(Client *c);
