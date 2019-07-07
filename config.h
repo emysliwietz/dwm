@@ -62,6 +62,8 @@ static const Layout layouts[] = {
 	{ "[M]",      monocle },
 	{ "TTT",      bstack },
 	{ "===",      bstackhoriz },
+	{ "[D]",      deck },
+	{ NULL,          NULL },
 };
 
 /* key definitions */
@@ -83,6 +85,7 @@ static const char *termcmd[]  = { "st", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
 
+#include "zoomswap.c"
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
@@ -100,6 +103,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_plus,   focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_minus,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_plus,   tagmon,         {.i = +1 } },
+	{ MODKEY,         		Mod1Mask,  cyclelayout,    {.i = +1 } },
+	{ MODKEY|ShiftMask,             Mod1Mask,  cyclelayout,    {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, setgaps,        {.i = -5 } },
 	{ MODKEY,                       XK_period, setgaps,        {.i = +5 } },
 	{ MODKEY|ShiftMask|ControlMask, XK_period, setgaps,        {.i = 0  } },
@@ -113,6 +118,7 @@ static Key keys[] = {
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
 	{ MODKEY|ShiftMask,             XK_Escape,      quit,           {0} },
+	{ 0,             HOLDKEY,      holdbar,           {0} },
 };
 
 /* button definitions */
@@ -124,8 +130,10 @@ static Button buttons[] = {
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
 	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
+	{ ClkClientWin,         MODKEY|ShiftMask, Button1,      movemouse,      {.i = 1} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
+	{ ClkClientWin,         MODKEY|ShiftMask, Button3,      resizemouse,    {.i = 1} },
 	{ ClkTagBar,            0,              Button1,        view,           {0} },
 	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
