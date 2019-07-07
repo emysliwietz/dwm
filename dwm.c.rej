@@ -1,53 +1,12 @@
---- dwm.c.orig	2014-02-09 15:24:16.008117074 +0100
-+++ dwm.c	2014-02-09 15:24:16.000117074 +0100
-@@ -234,6 +234,7 @@
- static void zoom(const Arg *arg);
- 
- /* variables */
-+static Client *prevzoom = NULL;
- static const char broken[] = "broken";
- static char stext[256];
- static int screen;
-@@ -2033,14 +2034,38 @@
- void
- zoom(const Arg *arg) {
- 	Client *c = selmon->sel;
-+	Client *at = NULL, *cold, *cprevious = NULL;
- 
- 	if(!selmon->lt[selmon->sellt]->arrange
- 	|| (selmon->sel && selmon->sel->isfloating))
- 		return;
--	if(c == nexttiled(selmon->clients))
--		if(!c || !(c = nexttiled(c->next)))
--			return;
--	pop(c);
-+	if(c == nexttiled(selmon->clients)) {
-+		at = findbefore(prevzoom);
-+		if(at)
-+			cprevious = nexttiled(at->next);
-+		if(!cprevious || cprevious != prevzoom) {
-+			prevzoom = NULL;
-+			if(!c || !(c = nexttiled(c->next)))
-+				return;
-+		} else
-+			c = cprevious;
-+	}
-+	cold = nexttiled(selmon->clients);
-+	if(c != cold && !at)
-+		at = findbefore(c);
-+	detach(c);
-+	attach(c);
-+	/* swap windows instead of pushing the previous one down */
-+	if(c != cold && at) {
-+		prevzoom = cold;
-+		if(cold && at != cold) {
-+			detach(cold);
-+			cold->next = at->next;
-+			at->next = cold;
-+		}
-+	}
-+	focus(c);
-+	arrange(c->mon);
- }
- 
- int
+--- dwm.c
++++ dwm.c
+@@ -564,9 +563,6 @@ configurenotify(XEvent *e)
+ 			drw_resize(drw, sw, bh);
+ 			updatebars();
+ 			for (m = mons; m; m = m->next) {
+-				for (c = m->clients; c; c = c->next)
+-					if (c->isfullscreen)
+-						resizeclient(c, m->mx, m->my, m->mw, m->mh);
+ 				XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, bh);
+ 			}
+ 			focus(NULL);
