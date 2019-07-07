@@ -1965,6 +1965,7 @@ setmfact(const Arg *arg)
 	arrange(selmon);
 }
 
+void
 setsmfact(const Arg *arg) {
 	float sf;
 

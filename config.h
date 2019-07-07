@@ -69,9 +69,9 @@ static const Layout layouts[] = {
 /* key definitions */
 #define MODKEY Mod4Mask
 #define TAGKEYS(KEY,TAG) \
-	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
+	{ MODKEY,                       KEY,      comboview,      {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
-	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
+	{ MODKEY|ShiftMask,             KEY,      combotag,       {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
 #define HOLDKEY Mod4Mask // replace 0 with the keysym to activate holdbar
 
@@ -98,8 +98,8 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_F1,     togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_z,      togglesticky,   {0} },
-	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
-	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
+	{ MODKEY,                       XK_0,      comboview,      {.ui = ~0 } },
+	{ MODKEY|ShiftMask,             XK_0,      combotag,       {.ui = ~0 } },
 	{ MODKEY,                       XK_minus,  focusmon,       {.i = -1 } },
 	{ MODKEY,                       XK_plus,   focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_minus,  tagmon,         {.i = -1 } },
@@ -118,8 +118,8 @@ static Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask,             XK_Escape,      quit,           {0} },
-	{ 0,             HOLDKEY,      holdbar,           {0} },
+	{ MODKEY|ShiftMask,             XK_Escape, quit,           {0} },
+	{ 0,                            HOLDKEY,   holdbar,        {0} },
 };
 
 /* button definitions */
