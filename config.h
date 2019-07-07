@@ -18,17 +18,10 @@ static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
 static const char col_cyan[]        = "#005577";
-static const unsigned int baralpha = 0xd0;
-static const unsigned int borderalpha = OPAQUE;
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
-};
-static const unsigned int alphas[][3]      = {
-	/*               fg      bg        border     */
-	[SchemeNorm] = { OPAQUE, baralpha, borderalpha },
-	[SchemeSel]  = { OPAQUE, baralpha, borderalpha },
 };
 
 /* tagging */
@@ -73,7 +66,7 @@ static const Layout layouts[] = {
 	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
 	{ MODKEY|ShiftMask,             KEY,      combotag,       {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
-#define HOLDKEY Mod4Mask // replace 0 with the keysym to activate holdbar
+#define HOLDKEY 0 // replace 0 with the keysym to activate holdbar
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
@@ -104,8 +97,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_plus,   focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_minus,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_plus,   tagmon,         {.i = +1 } },
-	{ MODKEY,         		Mod1Mask,  cyclelayout,    {.i = +1 } },
-	{ MODKEY|ShiftMask,             Mod1Mask,  cyclelayout,    {.i = -1 } },
+	{ MODKEY,         		XK_less,   cyclelayout,    {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_less,   cyclelayout,    {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, setgaps,        {.i = -5 } },
 	{ MODKEY,                       XK_period, setgaps,        {.i = +5 } },
 	{ MODKEY|ShiftMask|ControlMask, XK_period, setgaps,        {.i = 0  } },

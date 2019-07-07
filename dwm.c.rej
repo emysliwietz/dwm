@@ -1,61 +1,34 @@
 --- dwm.c
 +++ dwm.c
-@@ -249,6 +254,7 @@ static int (*xerrorxlib)(Display *, XErrorEvent *);
- static unsigned int numlockmask = 0;
- static void (*handler[LASTEvent]) (XEvent *) = {
- 	[ButtonPress] = buttonpress,
-+	[ButtonRelease] = keyrelease,
- 	[ClientMessage] = clientmessage,
- 	[ConfigureRequest] = configurerequest,
- 	[ConfigureNotify] = configurenotify,
-@@ -256,6 +262,7 @@ static void (*handler[LASTEvent]) (XEvent *) = {
- 	[EnterNotify] = enternotify,
- 	[Expose] = expose,
- 	[FocusIn] = focusin,
-+	[KeyRelease] = keyrelease,
- 	[KeyPress] = keypress,
- 	[MappingNotify] = mappingnotify,
- 	[MapRequest] = maprequest,
-@@ -279,6 +286,42 @@ static Window root;
- struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
- 
- /* function implementations */
-+static int combo = 0;
-+
-+void
-+keyrelease(XEvent *e) {
-+	combo = 0;
-+}
-+
-+void
-+combotag(const Arg *arg) {
-+	if(selmon->sel && arg->ui & TAGMASK) {
-+		if (combo) {
-+			selmon->sel->tags |= arg->ui & TAGMASK;
-+		} else {
-+			combo = 1;
-+			selmon->sel->tags = arg->ui & TAGMASK;
-+		}
-+		focus(NULL);
-+		arrange(selmon);
-+	}
-+}
-+
-+void
-+comboview(const Arg *arg) {
-+	unsigned newtags = arg->ui & TAGMASK;
-+	if (combo) {
-+		selmon->tagset[selmon->seltags] |= newtags;
-+	} else {
-+		selmon->seltags ^= 1;	/*toggle tagset*/
-+		combo = 1;
-+		if (newtags)
-+			selmon->tagset[selmon->seltags] = newtags;
-+	}
-+	focus(NULL);
-+	arrange(selmon);
-+}
-+
- void
- applyrules(Client *c)
- {
+@@ -1569,7 +1560,7 @@ setup(void)
+ 	/* init appearance */
+ 	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
+ 	for (i = 0; i < LENGTH(colors); i++)
+-		scheme[i] = drw_scm_create(drw, colors[i], alphas[i], 3);
++		scheme[i] = drw_scm_create(drw, colors[i], 3);
+ 	/* init bars */
+ 	updatebars();
+ 	updatestatus();
+@@ -1804,18 +1795,16 @@ updatebars(void)
+ 	Monitor *m;
+ 	XSetWindowAttributes wa = {
+ 		.override_redirect = True,
+-		.background_pixel = 0,
+-		.border_pixel = 0,
+-		.colormap = cmap,
++		.background_pixmap = ParentRelative,
+ 		.event_mask = ButtonPressMask|ExposureMask
+ 	};
+ 	XClassHint ch = {"dwm", "dwm"};
+ 	for (m = mons; m; m = m->next) {
+ 		if (m->barwin)
+ 			continue;
+-		m->barwin = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh, 0, depth,
+-		                          InputOutput, visual,
+-		                          CWOverrideRedirect|CWBackPixel|CWBorderPixel|CWColormap|CWEventMask, &wa);
++		m->barwin = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh, 0, DefaultDepth(dpy, screen),
++				CopyFromParent, DefaultVisual(dpy, screen),
++				CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
+ 		XDefineCursor(dpy, m->barwin, cursor[CurNormal]->cursor);
+ 		XMapRaised(dpy, m->barwin);
+ 		XSetClassHint(dpy, m->barwin, &ch);
