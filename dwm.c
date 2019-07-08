@@ -187,6 +187,7 @@ static void configurerequest(XEvent *e);
 static Monitor *createmon(void);
 static void cyclelayout(const Arg *arg);
 static void deck(Monitor *m);
+static void fyra(Monitor *m);
 static void destroynotify(XEvent *e);
 static void detach(Client *c);
 static void detachstack(Client *c);
@@ -235,6 +236,7 @@ static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
 static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
+static void fullscreen(const Arg *arg);
 static void setgaps(const Arg *arg);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
@@ -711,27 +713,90 @@ cleanup(void)
 
 void
 deck(Monitor *m) {
-	unsigned int i, n, h, mw, my;
-	Client *c;
+  unsigned int i, n, h, mw, my;
+  Client *c;
+  
+  for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+  if(n == 0)
+    return;
+  
+  if(n > m->nmaster) {
+    mw = m->nmaster ? m->ww * m->mfact : 0;
+    snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n - m->nmaster);
+  }
+  else
+    mw = m->ww;
+  for(i = my = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+    if(i < m->nmaster) {
+      h = (m->wh - my) / (MIN(n, m->nmaster) - i);
+      resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), False);
+      my += HEIGHT(c);
+    }
+    else
+      resize(c, m->wx + mw, m->wy, m->ww - mw - (2*c->bw), m->wh - (2*c->bw), False);
+}
 
-	for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-	if(n == 0)
-		return;
+Layout *last_layout;
+void fullscreen(const Arg *arg) {
+  if (selmon->showbar) {
+    for(last_layout = (Layout *)layouts; last_layout != selmon->lt[selmon->sellt]; last_layout++);
+    setlayout(&((Arg) { .v = &layouts[7] }));
+  } else {
+    setlayout(&((Arg) { .v = last_layout }));
+  }
+  togglebar(arg);
+}
 
-	if(n > m->nmaster) {
-		mw = m->nmaster ? m->ww * m->mfact : 0;
-		snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n - m->nmaster);
-	}
-	else
-		mw = m->ww;
-	for(i = my = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
-		if(i < m->nmaster) {
-			h = (m->wh - my) / (MIN(n, m->nmaster) - i);
-			resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), False);
-			my += HEIGHT(c);
-		}
-		else
-			resize(c, m->wx + mw, m->wy, m->ww - mw - (2*c->bw), m->wh - (2*c->bw), False);
+void
+fyra(Monitor *m) {
+  unsigned int i, n;
+  Client *c;
+  int FYRA_RIGHT_WIDTH = m->ww - (m->ww * m->mfact);
+  int FYRA_BOTTOM_HEIGHT = m->wh * m->smfact;
+  int g = m->gappx / 2;
+  
+  for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+  if(n == 0)
+    return;
+  if (n > m->nmaster + 2) {
+    snprintf(m->ltsymbol, sizeof m->ltsymbol, "%d[%d]", m->nmaster, n - m->nmaster - 2);
+  } else {
+    snprintf(m->ltsymbol, sizeof m->ltsymbol, "%d[+]", m->nmaster);    
+  }
+  
+  if (n == m->nmaster)
+    for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+      resize(c, m->wx + g, m->wy + g, m->ww - 2*g, m->wh - 2*g, False);
+  else if (n == m->nmaster + 1)
+    for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+      if (i < m->nmaster)
+	resize(c, m->wx + g, m->wy + g, m->ww - FYRA_RIGHT_WIDTH - g, m->wh - 2*g, False);
+      else
+	resize(c, m->ww - FYRA_RIGHT_WIDTH + g, m->wy + g, FYRA_RIGHT_WIDTH - 2*g, m->wh - 2*g, False);
+  else if (n == m->nmaster + 2)
+    for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+      if (i < m->nmaster)
+	resize(c, m->wx + g, m->wy + g, m->ww - FYRA_RIGHT_WIDTH - g, m->wh - FYRA_BOTTOM_HEIGHT - g, False);
+      else if (i == m->nmaster)
+	resize(c, m->wx + g, m->wy + m->wh - FYRA_BOTTOM_HEIGHT + g, m->ww - FYRA_RIGHT_WIDTH - g, FYRA_BOTTOM_HEIGHT - 2*g, False);
+      else
+	resize(c, m->wx + m->ww - FYRA_RIGHT_WIDTH + g, m->wy + g, FYRA_RIGHT_WIDTH - 2*g, m->wh - 2*g, False);
+  else
+  for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+    if(i < m->nmaster) {
+      // Main master pane
+      resize(c, m->wx + g, m->wy + g, m->ww - FYRA_RIGHT_WIDTH - g, m->wh - FYRA_BOTTOM_HEIGHT - g, False);
+    }
+    else if (i == m->nmaster) {
+      // Bottom pane
+      resize(c, m->wx + g, m->wy + m->wh - FYRA_BOTTOM_HEIGHT + g, m->ww - FYRA_RIGHT_WIDTH - g, FYRA_BOTTOM_HEIGHT - 2*g, False);
+    } else if (i == m->nmaster + 1) {
+      // Corner pane
+      resize(c, m->wx + m->ww - FYRA_RIGHT_WIDTH + g, m->wy + g, FYRA_RIGHT_WIDTH - 2*g, FYRA_CORNER_HEIGHT - g, False);
+    } else {
+      // Right stack
+      resize(c, m->wx + m->ww - FYRA_RIGHT_WIDTH + g, m->wy + FYRA_CORNER_HEIGHT + g, FYRA_RIGHT_WIDTH - 2*g, m->wh - FYRA_CORNER_HEIGHT - 2*g, False);
+    } 
 }
 
 void
@@ -1933,6 +1998,7 @@ setlayout(const Arg *arg)
 {
 	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt])
 		selmon->sellt ^= 1;
+
 	if (arg && arg->v)
 		selmon->lt[selmon->sellt] = (Layout *)arg->v;
 	strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol, sizeof selmon->ltsymbol);
