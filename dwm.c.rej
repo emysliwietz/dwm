@@ -1,34 +1,23 @@
 --- dwm.c
 +++ dwm.c
-@@ -1569,7 +1560,7 @@ setup(void)
+@@ -802,9 +903,7 @@ drawbar(Monitor *m)
+ 
+ 	/* draw status first so it can be overdrawn by tags later */
+ 	if (m == selmon) { /* status is only drawn on selected monitor */
+-		drw_setscheme(drw, scheme[SchemeNorm]);
+-		sw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
+-		drw_text(drw, m->ww - sw, 0, sw, bh, 0, stext, 0);
++		sw = m->ww - drawstatusbar(m, bh, stext);
+ 	}
+ 
+ 	for (c = m->clients; c; c = c->next) {
+@@ -1673,7 +1772,8 @@ setup(void)
+ 	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
+ 	cursor[CurMove] = drw_cur_create(drw, XC_fleur);
  	/* init appearance */
- 	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
+-	scheme = ecalloc(LENGTH(colors), sizeof(Scm));
++	scheme = ecalloc(LENGTH(colors) + 1, sizeof(Scm));
++	scheme[LENGTH(colors)] = drw_scm_create(drw, colors[0], 3);
  	for (i = 0; i < LENGTH(colors); i++)
--		scheme[i] = drw_scm_create(drw, colors[i], alphas[i], 3);
-+		scheme[i] = drw_scm_create(drw, colors[i], 3);
+ 		scheme[i] = drw_scm_create(drw, colors[i], 3);
  	/* init bars */
- 	updatebars();
- 	updatestatus();
-@@ -1804,18 +1795,16 @@ updatebars(void)
- 	Monitor *m;
- 	XSetWindowAttributes wa = {
- 		.override_redirect = True,
--		.background_pixel = 0,
--		.border_pixel = 0,
--		.colormap = cmap,
-+		.background_pixmap = ParentRelative,
- 		.event_mask = ButtonPressMask|ExposureMask
- 	};
- 	XClassHint ch = {"dwm", "dwm"};
- 	for (m = mons; m; m = m->next) {
- 		if (m->barwin)
- 			continue;
--		m->barwin = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh, 0, depth,
--		                          InputOutput, visual,
--		                          CWOverrideRedirect|CWBackPixel|CWBorderPixel|CWColormap|CWEventMask, &wa);
-+		m->barwin = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh, 0, DefaultDepth(dpy, screen),
-+				CopyFromParent, DefaultVisual(dpy, screen),
-+				CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
- 		XDefineCursor(dpy, m->barwin, cursor[CurNormal]->cursor);
- 		XMapRaised(dpy, m->barwin);
- 		XSetClassHint(dpy, m->barwin, &ch);
