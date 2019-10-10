@@ -109,6 +109,7 @@ struct Client {
 	char name[256];
 	float mina, maxa;
 	int x, y, w, h;
+	int sfx, sfy, sfw, sfh; /* stored float geometry, used on mode revert */
 	int oldx, oldy, oldw, oldh;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int bw, oldbw;
@@ -139,6 +140,7 @@ struct Monitor {
 	char ltsymbol[16];
 	float mfact;
 	float smfact;
+  	float shfact;
 	int nmaster;
 	int num;
 	int by;               /* bar geometry */
@@ -252,6 +254,7 @@ static void setgaps(const Arg *arg);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setsmfact(const Arg *arg);
+static void setshfact(const Arg *arg);
 static void setup(void);
 static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
@@ -810,6 +813,7 @@ fyra(Monitor *m) {
   Client *c;
   int FYRA_RIGHT_WIDTH = m->ww - (m->ww * m->mfact);
   int FYRA_BOTTOM_HEIGHT = m->wh * m->smfact;
+  int FYRA_CORNER_HEIGHT = m->wh * m->shfact;
   int g = m->gappx / 2;
   
   for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
@@ -1041,6 +1045,7 @@ createmon(void)
 	m->tagset[0] = m->tagset[1] = 1;
 	m->mfact = mfact;
 	m->smfact = smfact;
+	m->shfact = shfact;
 	m->nmaster = nmaster;
 	m->showbar = showbar;
 	m->topbar = topbar;
@@ -1627,6 +1632,10 @@ manage(Window w, XWindowAttributes *wa)
 	updatewindowtype(c);
 	updatesizehints(c);
 	updatewmhints(c);
+	c->sfx = c->x;
+	c->sfy = c->y;
+	c->sfw = c->w;
+	c->sfh = c->h;
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 	grabbuttons(c, 0);
 	if (!c->isfloating)
@@ -2202,6 +2211,19 @@ setsmfact(const Arg *arg) {
 }
 
 void
+setshfact(const Arg *arg) {
+	float sf;
+
+	if(!arg || !selmon->lt[selmon->sellt]->arrange)
+		return;
+	sf = arg->sf < 1.0 ? arg->sf + selmon->shfact : arg->sf - 1.0;
+	if(sf < 0 || sf > 0.9)
+		return;
+	selmon->shfact = sf;
+	arrange(selmon);
+}
+
+void
 setup(void)
 {
 	int i;
@@ -2358,8 +2380,8 @@ tagmon(const Arg *arg)
 
 void
 tile(Monitor *m) {
-	unsigned int i, n, h, smh, mw, my, ty;
-	Client *c;
+        unsigned int i, n, h, smh, shh, mw, my, ty;
+        Client *c;
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
 	if (n == 0)
@@ -2429,8 +2451,16 @@ togglefloating(const Arg *arg)
 		return;
 	selmon->sel->isfloating = !selmon->sel->isfloating || selmon->sel->isfixed;
 	if (selmon->sel->isfloating)
-		resize(selmon->sel, selmon->sel->x, selmon->sel->y,
-			selmon->sel->w, selmon->sel->h, 0);
+		/*restore last known float dimensions*/
+		resize(selmon->sel, selmon->sel->sfx, selmon->sel->sfy,
+		       selmon->sel->sfw, selmon->sel->sfh, 0);
+	else {
+		/*save last known float dimensions*/
+		selmon->sel->sfx = selmon->sel->x;
+		selmon->sel->sfy = selmon->sel->y;
+		selmon->sel->sfw = selmon->sel->w;
+		selmon->sel->sfh = selmon->sel->h;
+	}
 	if (!selmon->sel->isfloating && selmon->sel->crop)
 		cropdelete(selmon->sel);
 	arrange(selmon);
