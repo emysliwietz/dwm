@@ -5,10 +5,10 @@ static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int gappx     = 25;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int minwsz    = 0;       /* Minimal heigt of a client for smfact */
+static const unsigned int minwsh    = 0;       /* Minimal heigt of a client for right horizontal fyra fact */
 static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayspacing = 2;   /* systray spacing */
 static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first */
-static const int FYRA_CORNER_HEIGHT = 512;
 static const int showsystray        = 1;     /* 0 means no systray */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
@@ -41,6 +41,7 @@ static const Rule rules[] = {
 /* layout(s) */
 static const float mfact     = 0.8; /* factor of master area size [0.05..0.95] */
 static const float smfact     = 0.2; /* factor of tiled clients [0.00..0.95] */
+static const float shfact     = 0.2; /* factor of tertiary tiled clients [0.00..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 
@@ -86,12 +87,14 @@ static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
 	{ MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
+	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
+	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
 	{ MODKEY|ShiftMask,             XK_h,      setsmfact,      {.f = +0.05} },
 	{ MODKEY|ShiftMask,             XK_l,      setsmfact,      {.f = -0.05} },
+	{ MODKEY|ControlMask,           XK_h,      setshfact,      {.f = +0.05} },
+	{ MODKEY|ControlMask,           XK_l,      setshfact,      {.f = -0.05} },
 	{ MODKEY,                       XK_q,      killclient,     {0} },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1} },
 	{ MODKEY|ShiftMask,             XK_i,      incnmaster,     {.i = -1} },
