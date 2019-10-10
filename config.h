@@ -96,6 +96,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1} },
 	{ MODKEY|ShiftMask,             XK_i,      incnmaster,     {.i = -1} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
+	{ MODKEY,                       0x1008ff12,     togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_F1,     togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_z,      togglesticky,   {0} },
 	{ MODKEY,                       XK_f,      fullscreen,     {0} },
