@@ -310,6 +310,8 @@ static void bstackhoriz(Monitor *m);
 static void centeredmaster(Monitor *m);
 static void centeredfloatingmaster(Monitor *m);
 
+static void jump(const Arg *arg);
+
 static void keyrelease(XEvent *e);
 static void combotag(const Arg *arg);
 static void comboview(const Arg *arg);
@@ -1134,6 +1136,48 @@ dirtomon(int dir)
 	else
 		for (m = mons; m->next != selmon; m = m->next);
 	return m;
+}
+
+void jump(const Arg *arg) {
+  Client *c, *d;
+  unsigned int i = 0;
+  char *shellcmd;
+  FILE *fp;
+  unsigned int selectedprocess;
+  Client *cs[512];
+
+  if (!selmon->clients) return;
+  
+  if (!(shellcmd = (char*) malloc(512 * sizeof(char))))
+    die("malloc");
+
+  d = selmon->clients;
+  system("truncate -s 0 /tmp/dwmclients");
+  for (c = d; c; c = c->next) {
+    cs[i] = c;
+    snprintf(shellcmd, 512 * sizeof(char), "echo '%s (%d)' >> /tmp/dwmclients", c->name, i++);
+    system(shellcmd);
+  }
+    
+  fp = popen("cat /tmp/dwmclients | dmenu -i -l 32 | awk '{print $NF}' | sed 's/^.//;s/.$//'", "r");
+  if (!fp)
+    die("popen");
+
+  if (!fgets(shellcmd, sizeof(shellcmd)-1, fp)) {
+    return;
+  }
+
+  selectedprocess = atoi(shellcmd);
+  pclose(fp);
+  free(shellcmd);
+
+  for (i = 0; i < LENGTH(tags) && !((1 << i) & cs[selectedprocess]->tags); i++);
+  if (i < LENGTH(tags)) {
+    const Arg a = {.ui = 1 << i};
+    view(&a);
+    focus(cs[selectedprocess]);
+    restack(selmon);
+  }
 }
 
 int

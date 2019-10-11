@@ -110,6 +110,7 @@ static Key keys[] = {
 	{ MODKEY,                       0x1008ff12,     togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_F1,     togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_z,      togglesticky,   {0} },
+	{ MODKEY,                       XK_n,      jump,           {0} },
 	{ MODKEY,                       XK_f,      fullscreen,     {0} },
 	{ MODKEY,                       XK_0,      comboview,      {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      combotag,       {.ui = ~0 } },
