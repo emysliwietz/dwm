@@ -873,9 +873,9 @@ fyra(Monitor *m) {
       if (i < m->nmaster)
 	resize(c, m->wx + g, m->wy + g, m->ww - FYRA_RIGHT_WIDTH - g, m->wh - FYRA_BOTTOM_HEIGHT - g, False);
       else if (i == m->nmaster)
-	resize(c, m->wx + g, m->wy + m->wh - FYRA_BOTTOM_HEIGHT + g, m->ww - FYRA_RIGHT_WIDTH - g, FYRA_BOTTOM_HEIGHT - 2*g, False);
-      else
 	resize(c, m->wx + m->ww - FYRA_RIGHT_WIDTH + g, m->wy + g, FYRA_RIGHT_WIDTH - 2*g, m->wh - 2*g, False);
+      else
+	resize(c, m->wx + g, m->wy + m->wh - FYRA_BOTTOM_HEIGHT + g, m->ww - FYRA_RIGHT_WIDTH - g, FYRA_BOTTOM_HEIGHT - 2*g, False);
   else
   for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
     if(i < m->nmaster) {
@@ -883,11 +883,11 @@ fyra(Monitor *m) {
       resize(c, m->wx + g, m->wy + g, m->ww - FYRA_RIGHT_WIDTH - g, m->wh - FYRA_BOTTOM_HEIGHT - g, False);
     }
     else if (i == m->nmaster) {
-      // Bottom pane
-      resize(c, m->wx + g, m->wy + m->wh - FYRA_BOTTOM_HEIGHT + g, m->ww - FYRA_RIGHT_WIDTH - g, FYRA_BOTTOM_HEIGHT - 2*g, False);
-    } else if (i == m->nmaster + 1) {
       // Corner pane
       resize(c, m->wx + m->ww - FYRA_RIGHT_WIDTH + g, m->wy + g, FYRA_RIGHT_WIDTH - 2*g, FYRA_CORNER_HEIGHT - g, False);
+    } else if (i == m->nmaster + 1) {
+      // Bottom pane
+      resize(c, m->wx + g, m->wy + m->wh - FYRA_BOTTOM_HEIGHT + g, m->ww - FYRA_RIGHT_WIDTH - g, FYRA_BOTTOM_HEIGHT - 2*g, False);
     } else {
       // Right stack
       resize(c, m->wx + m->ww - FYRA_RIGHT_WIDTH + g, m->wy + FYRA_CORNER_HEIGHT + g, FYRA_RIGHT_WIDTH - 2*g, m->wh - FYRA_CORNER_HEIGHT - 2*g, False);
@@ -2307,7 +2307,7 @@ setmfact(const Arg *arg)
 	if (!arg || !selmon->lt[selmon->sellt]->arrange)
 		return;
 	f = arg->f < 1.0 ? arg->f + selmon->mfact : arg->f - 1.0;
-	if (f < 0.1 || f > 0.9)
+	if (f < 0 || f > 1)
 		return;
 	selmon->mfact = f;
 	arrange(selmon);
@@ -2320,7 +2320,7 @@ setsmfact(const Arg *arg) {
 	if(!arg || !selmon->lt[selmon->sellt]->arrange)
 		return;
 	sf = arg->sf < 1.0 ? arg->sf + selmon->smfact : arg->sf - 1.0;
-	if(sf < 0 || sf > 0.9)
+	if(sf < 0.1 || sf > 1.0)
 		return;
 	selmon->smfact = sf;
 	arrange(selmon);
