@@ -825,7 +825,7 @@ fyra(Monitor *m) {
   int FYRA_BOTTOM_HEIGHT = m->wh * m->smfact;
   int FYRA_CORNER_HEIGHT = m->wh * m->shfact;
   int g = m->gappx / 2;
-  
+
   for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
   if(n == 0)
     return;
@@ -1450,17 +1450,17 @@ pushstack(const Arg *arg) {
 	if(i < 0)
 		return;
 	else if(i == 0) {
-		detach(sel);
-		attach(sel);
+	  //detach(sel);
+	  //attach(sel);
 	}
 	else {
-		for(p = NULL, c = selmon->clients; c; p = c, c = c->next)
-			if(!(i -= (ISVISIBLE(c) && c != sel)))
-				break;
-		c = c ? c : p;
-		detach(sel);
-		sel->next = c->next;
-		c->next = sel;
+	  for(p = NULL, c = selmon->clients; c; p = c, c = c->next)
+	    if(!(i -= (ISVISIBLE(c) && c != sel)))
+	      break;
+	  c = c ? c : p;
+	  detach(sel);
+	  sel->next = c->next;
+	  c->next = sel;
 	}
 	arrange(selmon);
 }
