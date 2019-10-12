@@ -641,10 +641,22 @@ arrangemon(Monitor *m)
 }
 
 void
-attach(Client *c)
-{
-	c->next = c->mon->clients;
-	c->mon->clients = c;
+attach(Client *c) {
+  //  Client *tmp, *last_one;
+  //
+  //  for(tmp = c->mon->clients; tmp; tmp = tmp->next) {
+  //    last_one = tmp;
+  //  }
+  //  if (last_one) {
+  //     last_one->next = c;
+  //     c->next = NULL; 
+  //  } else {
+  //    c->mon->clients = c;
+  //  }
+
+  // To have it attach as the first client
+  c->next = c->mon->clients;
+  c->mon->clients = c;
 }
 
 void
@@ -1443,15 +1455,14 @@ focusstack(const Arg *arg)
 }
 
  void
-pushstack(const Arg *arg) {
+pushstack(const Arg *arg) {  
 	int i = stackpos(arg);
 	Client *sel = selmon->sel, *c, *p;
-
 	if(i < 0)
 		return;
 	else if(i == 0) {
-	  //detach(sel);
-	  //attach(sel);
+	  detach(sel);
+	  attach(sel);
 	}
 	else {
 	  for(p = NULL, c = selmon->clients; c; p = c, c = c->next)

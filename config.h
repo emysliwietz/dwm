@@ -1,3 +1,8 @@
+#include "zoomswap.c"
+#include "movestack.c"
+#include "fibonacci.c"
+#include "selfrestart.c"
+
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
@@ -18,7 +23,7 @@ static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#004410";
+static const char col_cyan[]        = "#004410";//
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
@@ -45,7 +50,6 @@ static const float shfact     = 0.2; /* factor of tertiary tiled clients [0.00..
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 
-#include "fibonacci.c"
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[+]",      fyra },
@@ -89,8 +93,6 @@ static const char *termcmd[]  = { "st", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
 
-#include "zoomswap.c"
-#include "movestack.c"
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	STACKKEYS(MODKEY,                          focus)
@@ -133,6 +135,7 @@ static Key keys[] = {
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
 	{ MODKEY|ShiftMask,             XK_Escape, quit,           {0} },
+	{ MODKEY|ShiftMask|ControlMask, XK_Escape, self_restart,           {0} },
 	{ 0,                            HOLDKEY,   holdbar,        {0} },
 };
 
