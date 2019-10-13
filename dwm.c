@@ -871,11 +871,13 @@ fyra(Monitor *m) {
   else if (n == m->nmaster + 2)
     for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
       if (i < m->nmaster)
-	resize(c, m->wx + g, m->wy + g, m->ww - FYRA_RIGHT_WIDTH - g, m->wh - FYRA_BOTTOM_HEIGHT - g, False);
+	//	resize(c, m->wx + g, m->wy + g, m->ww - FYRA_RIGHT_WIDTH - g, m->wh - FYRA_BOTTOM_HEIGHT - 2*g, False);
+	resize(c, m->wx + g, m->wy + g, m->ww - FYRA_RIGHT_WIDTH - g, m->wh - 2*g, False);
       else if (i == m->nmaster)
-	resize(c, m->wx + m->ww - FYRA_RIGHT_WIDTH + g, m->wy + g, FYRA_RIGHT_WIDTH - 2*g, m->wh - 2*g, False);
+	resize(c, m->wx + m->ww - FYRA_RIGHT_WIDTH + g, m->wy + g, FYRA_RIGHT_WIDTH - 2*g, FYRA_CORNER_HEIGHT - g, False);
       else
-	resize(c, m->wx + g, m->wy + m->wh - FYRA_BOTTOM_HEIGHT + g, m->ww - FYRA_RIGHT_WIDTH - g, FYRA_BOTTOM_HEIGHT - 2*g, False);
+	//	resize(c, m->wx + g, m->wy + m->wh - FYRA_BOTTOM_HEIGHT + g, m->ww - FYRA_RIGHT_WIDTH - g, FYRA_BOTTOM_HEIGHT - 2*g, False);
+        resize(c, m->wx + m->ww - FYRA_RIGHT_WIDTH + g, m->wy + FYRA_CORNER_HEIGHT + g, FYRA_RIGHT_WIDTH - 2*g, m->wh - FYRA_CORNER_HEIGHT - 2*g, False);
   else
   for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
     if(i < m->nmaster) {
@@ -885,7 +887,7 @@ fyra(Monitor *m) {
     else if (i == m->nmaster) {
       // Corner pane
       resize(c, m->wx + m->ww - FYRA_RIGHT_WIDTH + g, m->wy + g, FYRA_RIGHT_WIDTH - 2*g, FYRA_CORNER_HEIGHT - g, False);
-    } else if (i == m->nmaster + 1) {
+    } else if (i == m->nmaster + 2) {
       // Bottom pane
       resize(c, m->wx + g, m->wy + m->wh - FYRA_BOTTOM_HEIGHT + g, m->ww - FYRA_RIGHT_WIDTH - g, FYRA_BOTTOM_HEIGHT - 2*g, False);
     } else {
