@@ -147,12 +147,17 @@ struct Monitor {
 	float mfact;
 	float smfact;
   	float shfact;
+  	float old_mfact;
+	float old_smfact;
+  	float old_shfact;
+    	float old_gappx;
 	int nmaster;
 	int num;
 	int by;               /* bar geometry */
 	int mx, my, mw, mh;   /* screen size */
 	int wx, wy, ww, wh;   /* window area  */
 	int gappx;            /* gaps between windows */
+	int is_quadscreen;
 	unsigned int seltags;
 	unsigned int sellt;
 	unsigned int tagset[2];
@@ -258,6 +263,7 @@ static void setclientstate(Client *c, long state);
 static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
 static void fullscreen(const Arg *arg);
+static void quadscreen(const Arg *arg);
 static void setgaps(const Arg *arg);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
@@ -839,6 +845,39 @@ void fullscreen(const Arg *arg) {
     setlayout(&((Arg) { .v = last_layout }));
   }
   togglebar(arg);
+}
+
+void quadscreen(const Arg *arg) {
+  Client *c;
+  togglebar(arg);
+  if (selmon->is_quadscreen) {
+    for(c = nexttiled(selmon->clients); c; c = nexttiled(c->next)) {
+      setfullscreen(c, 0);
+    }
+    selmon->mfact  = selmon->old_mfact;
+    selmon->smfact = selmon->old_smfact;
+    selmon->shfact = selmon->old_shfact;
+    selmon->gappx  = selmon->old_gappx;
+    arrange(selmon);
+    selmon->is_quadscreen = 0;
+  } else {
+    for(c = nexttiled(selmon->clients); c; c = nexttiled(c->next)) {
+      setfullscreen(c, 1);
+    }
+    selmon->old_mfact  = selmon->mfact;
+    selmon->old_smfact = selmon->smfact;
+    selmon->old_shfact = selmon->shfact;
+    selmon->old_gappx = selmon->gappx;
+    
+    selmon->smfact = 0.5;
+    selmon->shfact = 0.5;
+    selmon->mfact = 0.5;
+    selmon->gappx = 0;
+
+    arrange(selmon);
+    selmon->is_quadscreen = 1;
+  }
+  
 }
 
 void
@@ -2317,7 +2356,7 @@ setmfact(const Arg *arg)
 
 void
 setsmfact(const Arg *arg) {
-	float sf;
+    	float sf;
 
 	if(!arg || !selmon->lt[selmon->sellt]->arrange)
 		return;

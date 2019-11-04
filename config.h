@@ -115,6 +115,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_n,      jump,           {0} },
 	{ MODKEY,                       XK_f,      fullscreen,     {0} },
 	{ MODKEY|ShiftMask,             XK_f,      togglebar,      {0} },
+	{ MODKEY|ShiftMask|ControlMask, XK_f,      quadscreen,     {0} },
 	{ MODKEY,                       XK_0,      comboview,      {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      combotag,       {.ui = ~0 } },
 	{ MODKEY,                       XK_minus,  focusmon,       {.i = -1 } },
