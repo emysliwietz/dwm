@@ -162,6 +162,7 @@ struct Monitor {
 	unsigned int sellt;
 	unsigned int tagset[2];
 	int showbar;
+        int is_fullscreen;
 	int topbar;
 	Client *clients;
 	Client *sel;
@@ -838,18 +839,19 @@ deck(Monitor *m) {
 
 Layout *last_layout;
 void fullscreen(const Arg *arg) {
-  if (selmon->showbar) {
+  if (selmon->is_fullscreen) {
     for(last_layout = (Layout *)layouts; last_layout != selmon->lt[selmon->sellt]; last_layout++);
     setlayout(&((Arg) { .v = &layouts[7] }));
   } else {
     setlayout(&((Arg) { .v = last_layout }));
   }
-  togglebar(arg);
+  selmon->is_fullscreen = !selmon->is_fullscreen;
+  if ((selmon->is_fullscreen && selmon->showbar) || (!selmon->is_fullscreen && !selmon->showbar))
+    togglebar(arg);
 }
 
 void quadscreen(const Arg *arg) {
   Client *c;
-  togglebar(arg);
   if (selmon->is_quadscreen) {
     for(c = nexttiled(selmon->clients); c; c = nexttiled(c->next)) {
       setfullscreen(c, 0);
