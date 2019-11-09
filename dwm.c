@@ -1206,7 +1206,7 @@ dirtomon(int dir)
 void jump(const Arg *arg) {
   Client *c, *d;
   unsigned int i = 0;
-  char *shellcmd;
+  char *shellcmd, *selectedtab;
   FILE *fp;
   unsigned int selectedprocess;
   Client *cs[512];
@@ -1214,6 +1214,8 @@ void jump(const Arg *arg) {
   if (!selmon->clients) return;
   
   if (!(shellcmd = (char*) malloc(512 * sizeof(char))))
+    die("malloc");
+  if (!(selectedtab = (char*) malloc(16 * sizeof(char))))
     die("malloc");
 
   d = selmon->clients;
@@ -1224,17 +1226,16 @@ void jump(const Arg *arg) {
     system(shellcmd);
   }
     
-  fp = popen("cat /tmp/dwmclients | dmenu -i -l 32 | awk '{print $NF}' | sed 's/^.//;s/.$//'", "r");
+  fp = popen("/home/user/.scripts/jump", "r");
   if (!fp)
     die("popen");
 
   if (!fgets(shellcmd, sizeof(shellcmd)-1, fp)) {
     return;
   }
-
   selectedprocess = atoi(shellcmd);
-  pclose(fp);
-  free(shellcmd);
+  fgets(selectedtab, sizeof(selectedtab)-1, fp);
+
 
   for (i = 0; i < LENGTH(tags) && !((1 << i) & cs[selectedprocess]->tags); i++);
   if (i < LENGTH(tags)) {
@@ -1243,6 +1244,10 @@ void jump(const Arg *arg) {
     focus(cs[selectedprocess]);
     restack(selmon);
   }
+  snprintf(shellcmd, 512 * sizeof(char), "brotab activate %s 2>/dev/null", selectedtab);
+  system(shellcmd);
+  pclose(fp);
+  free(shellcmd);
 }
 
 int
