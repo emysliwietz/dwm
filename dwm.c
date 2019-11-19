@@ -846,7 +846,7 @@ void fullscreen(const Arg *arg) {
     setlayout(&((Arg) { .v = last_layout }));
   }
   selmon->is_fullscreen = !selmon->is_fullscreen;
-  if ((selmon->is_fullscreen && selmon->showbar) || (!selmon->is_fullscreen && !selmon->showbar))
+  if ((selmon->is_fullscreen && !selmon->showbar) || (!selmon->is_fullscreen && selmon->showbar))
     togglebar(arg);
 }
 

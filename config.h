@@ -99,8 +99,8 @@ static Key keys[] = {
 	STACKKEYS(MODKEY|ShiftMask,                push)
 	{ MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
+	{ MODKEY,                       XK_h,      setmfact,       {.f = +0.05} },
+	{ MODKEY,                       XK_l,      setmfact,       {.f = -0.05} },
 	{ MODKEY|ShiftMask,             XK_h,      setsmfact,      {.f = +0.05} },
 	{ MODKEY|ShiftMask,             XK_l,      setsmfact,      {.f = -0.05} },
 	{ MODKEY|ControlMask,           XK_h,      setshfact,      {.f = +0.05} },
