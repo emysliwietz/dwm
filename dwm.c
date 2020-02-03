@@ -852,6 +852,7 @@ void fullscreen(const Arg *arg) {
 }
 
 void quadscreen(const Arg *arg) {
+  const char *shellcmd = "eval $(xdotool getmouselocation -shell) && xdotool mousemove 1000 700 click 1 click 1 mousemove 2600 700 click 1 click 1 mousemove 1000 1600 click 1 click 1 mousemove 2600 1600 click 1 click 1 mousemove $X $Y";
   Client *c;
   if (selmon->is_quadscreen) {
     for(c = nexttiled(selmon->clients); c; c = nexttiled(c->next)) {
@@ -879,6 +880,7 @@ void quadscreen(const Arg *arg) {
 
     arrange(selmon);
     selmon->is_quadscreen = 1;
+    system(shellcmd);
   }
   
 }
