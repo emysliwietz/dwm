@@ -1,3 +1,8 @@
+#include "selfrestart.c"
+#include "fibonacci.c"
+#include "zoomswap.c"
+#include "movestack.c"
+
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
@@ -44,7 +49,6 @@ static const float smfact     = 0.00; /* factor of tiled clients [0.00..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 
-#include "fibonacci.c"
 static const Layout layouts[] = {
 	/* symbol     arrange function */
  	{ "[@]",      spiral },
@@ -79,8 +83,7 @@ static const char *termcmd[]  = { "st", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
 
-#include "zoomswap.c"
-#include "movestack.c"
+
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
@@ -115,6 +118,7 @@ static Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
+    { MODKEY|ShiftMask,             XK_r,      self_restart,   {0} },
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
 	{ 0,             HOLDKEY,      holdbar,           {0} },
 };
@@ -137,4 +141,3 @@ static Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
-

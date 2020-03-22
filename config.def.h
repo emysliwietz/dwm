@@ -49,6 +49,7 @@ static const float smfact     = 0.00; /* factor of tiled clients [0.00..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 
+#include "grid.c"
 static const Layout layouts[] = {
 	/* symbol     arrange function */
  	{ "[@]",      spiral },
@@ -62,6 +63,7 @@ static const Layout layouts[] = {
 	{ "===",      bstackhoriz },
 	{ "[D]",      deck },
 	{ NULL,          NULL },
+	{ "HHH",      grid },
 };
 
 /* key definitions */
