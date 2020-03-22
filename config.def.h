@@ -1,7 +1,6 @@
 #include "zoomswap.c"
 #include "movestack.c"
 #include "fibonacci.c"
-#include "grid.c"
 #include "selfrestart.c"
 
 /* See LICENSE file for copyright and license details. */
@@ -64,7 +63,6 @@ static const Layout layouts[] = {
 	{ "TTT",      bstack },
 	{ "===",      bstackhoriz },
 	{ "[D]",      deck },
-	{ NULL,          NULL },
 	{ "HHH",      grid },
 };
 
@@ -114,7 +112,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_n,      jump,           {0} },
 	{ MODKEY,                       XK_f,      fullscreen,     {0} },
 	{ MODKEY|ShiftMask,             XK_f,      togglebar,      {0} },
-	{ MODKEY|ShiftMask|ControlMask, XK_f,      quadscreen,     {0} },
+	{ MODKEY|ShiftMask|ControlMask, XK_f,      setlayout,      {.v = &layouts[11]} },
 	{ MODKEY,                       XK_0,      comboview,      {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      combotag,       {.ui = ~0 } },
 	{ MODKEY,                       XK_minus,  focusmon,       {.i = -1 } },
