@@ -266,6 +266,7 @@ static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
 static void fullscreen(const Arg *arg);
 static void quadscreen(const Arg *arg);
+static void toggle_grid(const Arg *arg);
 static void setgaps(const Arg *arg);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
@@ -888,12 +889,6 @@ void quadscreen(const Arg *arg) {
 
 void
 grid(Monitor *m) {
-  if (m->is_quadscreen) {
-    m->is_quadscreen = 0;
-    setlayout(&((Arg) { .v = &layouts[0] }));
-    return;
-  }
-  m->is_quadscreen = 1;
 	unsigned int i, n, cx, cy, cw, ch, aw, ah, cols, rows;
 	Client *c;
 
@@ -918,6 +913,15 @@ grid(Monitor *m) {
 		resize(c, cx, cy, cw - 2 * c->bw + aw, ch - 2 * c->bw + ah, False);
 		i++;
 	}
+}
+
+void toggle_grid(const Arg *arg) {
+    if (selmon->is_quadscreen) {
+      setlayout(&((Arg) { .v = &layouts[0] }));
+    } else {
+      setlayout(&((Arg) { .v = &layouts[11] }));
+    }
+    selmon->is_quadscreen = !selmon->is_quadscreen;
 }
 
 void
